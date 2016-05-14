@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import win32gui
 import win32ui
 import win32con
@@ -26,7 +28,6 @@ mem_dc.SelectObject(screenshot)
 
 # copy the screen into our memory device context
 mem_dc.BitBlt((0, 0), (width, height), img_dc, (left, top), win32con.SRCCOPY)
-
 # save the bitmap to a file
 screenshot.SaveBitmapFile(mem_dc, 'c:\\WINDOWS\\Temp\\screenshot.bmp')
 

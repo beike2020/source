@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import sys
 import time
 import random
@@ -6,9 +8,9 @@ import ctypes
 
 user32   = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
-keystrokes       = 0
-mouse_clicks     = 0
-double_clicks    = 0
+keystrokes    = 0
+mouse_clicks  = 0
+double_clicks = 0
 
 
 class LASTINPUTINFO(ctypes.Structure):
@@ -31,7 +33,6 @@ def get_key_press():
     
     for i in range(0,0xff):
         if user32.GetAsyncKeyState(i) == -32767:
-            # 0x1 is the code for a left mouse click
             if i == 1:
                 mouse_clicks += 1
                 return time.time()
@@ -45,8 +46,8 @@ def detect_sandbox():
     global mouse_clicks
     global keystrokes
 
-    max_keystrokes   = random.randint(10,25)
-    max_mouse_clicks = random.randint(5,25)
+    max_keystrokes   = random.randint(10, 25)
+    max_mouse_clicks = random.randint(5, 25)
     double_clicks          = 0
     max_double_clicks      = 10
     double_click_threshold = 0.250
@@ -56,7 +57,6 @@ def detect_sandbox():
     previous_timestamp     = None
     detection_complete     = False
 
-    # if we hit our threshold let's bail out
     last_input = get_last_input()
     if last_input >= max_input_threshold:
         sys.exit(0)
@@ -68,10 +68,8 @@ def detect_sandbox():
             if elapsed <= double_click_threshold:
                 double_clicks += 1
                 if first_double_click is None:
-                    # grab the timestamp of the first double click
                     first_double_click = time.time()
                 else:
-                    # did they try to emulate a rapid succession of clicks?   
                     if double_clicks == max_double_clicks:
                         if keypress_time - first_double_click <= (max_double_clicks * double_click_threshold):
                             sys.exit(0)

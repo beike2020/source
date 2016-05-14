@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Modified example that is originally given here:
 # http://timgolden.me.uk/python/win32_how_do_i/watch_directory_for_changes.html
 import os
@@ -24,7 +26,6 @@ def inject_code(full_filename,extension,contents):
     if file_types[extension][0] in contents:
         return
     
-    # no marker let's inject the marker and code
     full_contents  = file_types[extension][0]
     full_contents += file_types[extension][1]
     full_contents += contents

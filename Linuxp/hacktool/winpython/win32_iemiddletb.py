@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import time
 import urllib
 import urlparse
