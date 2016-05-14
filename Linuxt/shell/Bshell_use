@@ -1,0 +1,391 @@
+#!/bin/sh
+
+#set -x
+#[show all cmd line and param, match set +x]
+
+#set -n
+#[show all cmd line and don't exec]
+
+#set -v
+#[show all line of read]
+
+menu_choice=""
+global_text="global variable"
+
+yes_or_no() 
+{
+	echo "Is your name $* ?"
+	while true
+	do
+		echo -n "Enter yes or no: "
+		read x
+		case "$x" in
+			y | yes ) return 0;;
+			n | no )  return 1;;
+			* )       echo "Answer yes or no"
+		esac
+	done
+}
+
+export_or_no()
+{
+	echo "$foo"
+	echo "$bar"
+}
+
+if_function()
+{
+	echo -n "Is it morning? Please answer yes or no: "
+	read timeofday
+	
+	if [ "$LONGNAME" != "root" ]; then
+		echo "You are not system root user"
+	else 
+		echo "Hello, root"
+	fi	
+
+	if [ -t ]; then
+		echo "We are in interactive mode"
+	else
+		echo "We are in background process mode"
+	fi
+	
+	if [ "$timeofday" = "yes" ]; then
+		echo "Good morning"
+	elif [ "$timeofday" = "no" ]; then
+		echo "Good afternoon"
+	else
+		echo "Sorry, $timeofday not recognized. Enter yes or no"
+	fi
+
+	[ "$timeofday" = "yes" ] && exit 0 || exit 1
+}
+
+case_function()
+{
+	echo "Is it morning? Please answer yes or no"
+	read timeofday
+	
+	case "$timeofday" in
+		[yY] | [yY][eE][sS] ) 
+			   echo "Good Morning"
+			   echo "Up bright and early this morning?"
+			   ;;
+		[nN] | [nN][oO] )  
+			   echo "Good Afternoon"
+			   ;;	
+		* )    
+			   echo "Sorry, answer not recognised"
+			   echo "Please answer yes or no"
+			   exit 1
+			   ;;
+	esac
+	
+	exit 0 
+}
+
+for_function()
+{
+	echo -n "Show all params"
+	for foo in bar "fud beike" 43
+	do
+	  	echo -n $foo
+	done
+
+	mkdir fredx
+	echo -n "Show ls -type file result"
+	for file in $(ls *); do
+		if [ -d "$file" ]; then
+    		echo "skipping directory $file"
+    		continue
+  		elif [-f "$file" -a -r "$file"]; then
+  		echo file is $file
+		fi
+	done
+
+	echo -n "Find string from all files"
+	for file in *
+	do
+  		if grep -q function $file 
+  		then
+    		echo $file 
+  		fi
+	done
+
+	for image in *.gif
+	do
+		cjpeg $image >${image%%gif}jpg
+	done
+	
+	exit 0
+}
+
+while_function()
+{
+	foo=1
+
+	while :
+	do
+		echo "foo in ${foo}th loop, we go again"
+		foo=$(($foo+1))
+		if [ "$foo" -gt 20 ]; then
+			break;
+		else
+			:
+		fi
+	done
+
+	exit 0
+}
+
+until_function()
+{
+	until who | grep "$1" > /dev/null
+	do
+		sleep 60
+	done
+		
+	echo -e '\a'
+	echo "***** $1 has just logged in *****"
+	
+	exit 0
+}
+
+variable_handle()
+{
+	echo "Unset variable: "
+	foo="Hello World"
+	echo $foo
+	echo "$foo"
+	echo '$foo'
+	echo \$foo
+	unset foo
+	echo $foo
+
+	echo "Variable cover: "
+    	echo $global_text
+	local global_text="local variable"
+    	echo $global_text
+
+	echo "Variable export: "
+	foo="The first meta-syntactic variable"
+	export bar="The second meta-syntactic variable"
+	export_or_no
+
+	echo "Variable split: "
+	unset foo
+	echo ${foo:-bar} 
+	foo=fud
+	echo ${foo:-bar}
+	foo=/usr/bin/X11/startx
+	echo ${foo#*/}
+	echo ${foo##*/}
+	bar=/usr/local/etc/local/networks
+	echo ${bar%local*}
+	echo ${bar%%local*}
+	
+	echo "Variable count"
+	foo=31
+	bar=4
+	x=`expr $foo / $bar` 
+	echo "31/4=$x"
+	
+	echo "Variable eval"
+	foo=100
+	x=foo
+	eval y='$'$x
+	printf "%s\n" $y
+	
+	echo "Readonly variabl: "
+        foo="Raw string"
+        echo $foo
+        readonly foo
+        foo="modify string"
+
+	exit 0
+}
+
+param_handle()
+{
+	echo "Show date: `date`, split: "
+	set $(date)
+	while [ "$1" != "" ]; do
+		echo "$1"
+		shift
+	done
+
+	set tom beike
+	if [ $# -lt 2 ]; then
+		echo "Param less than two!"
+		exit 1
+	fi
+
+	echo "The program $0 is now running"
+	echo "The program process id is $$"
+	echo "The number of param is $#"
+	echo "The first parameter is $1"
+	echo "The second parameter is $2"
+	echo "The parameter list is $@"
+	echo "Original parameters are $*"
+	echo "The user's home directory is $HOME"
+	if yes_or_no "$1"
+	then
+		echo "Hi $1, nice name"
+	else
+		echo "Never mind"
+	fi
+	echo "The program exit code is $?"
+
+	exit 0
+}
+
+option_handle()
+{
+	ALL=false
+	HELP=false
+	FILE=false
+	VERBOSE=false
+	COPIES=0
+
+	echo "`basename $0` -[a h f v] -[c value] file"
+	echo "Input option as follow: ./program -ah -c 8"
+	read options
+	set $options
+	while getopts :ahfgvc: OPTION
+	do
+		case $OPTION in
+		a)ALL=true
+			echo "ALL is $ALL"
+			;;
+		h)HELP=true
+			echo "HELP is $HELP"
+			;;
+		f)FILE=true
+			echo "FILE is $FILE"
+			;;
+		v)VERBOSE=true
+			echo "VERBOSE is $VERBOSE"
+			;;
+		c)COPIES=$OPTARG
+			echo "COPIES is $COPIES"
+			;;
+		\?)
+			echo "`basename $0` -[a h f v] -[c value] file" >&2
+			;;
+		esac
+	done
+	
+	exit 0
+}
+
+trap_function()
+{
+	trap 'rm -f /tmp/my_tmp_file_$$' INT
+	echo creating file /tmp/my_tmp_file_$$
+	date > /tmp/my_tmp_file_$$
+	
+	echo "Press interrupt (Ctrl-C) to interrupt...."
+	while [ -f /tmp/my_tmp_file_$$ ]; do
+		echo File exists
+		sleep 1
+	done
+	echo The file no longer exists
+	
+	trap '' INT
+	echo creating file /tmp/my_tmp_file_$$
+	date > /tmp/my_tmp_file_$$
+	
+	echo "Press interrupt (Ctrl-C) to interrupt...."
+	while [ -f /tmp/my_tmp_file_$$ ]; do
+		echo File exists
+		sleep 1
+	done
+	
+	echo We never get here
+	
+	exit 0
+}
+
+exec_function()
+{
+	echo "Exec Wshell_use start"
+	exec ./Wshell_use
+}
+
+source_function()
+{
+	echo "Exec source|. start"
+	#source param_handle
+	. ./source_handle 
+	lu1
+}
+
+#here_function()
+#{
+#	ed textfile <<!HI!
+#	3
+#	d
+#	.,\$s/is/was/
+#	w
+#	q
+#	!HI!
+#
+#	exit 0
+#}
+
+set_menu_choice() 
+{
+	clear
+	echo "Options :-"
+	echo
+	echo "   1) test if function"
+	echo "   2) test case function"
+	echo "   3) test for function"
+	echo "   4) test while function"
+	echo "   5) test until function"
+	echo "   6) test variable handle"
+	echo "   7) test param handle"
+	echo "   8) test option handle"
+	echo "	 9) test trap function"
+	echo "	10) test exec function"
+	echo "	11) test source function"
+	echo "	12) test here function"
+	echo -e "Please enter choice or press q return: \c"
+	read menu_choice
+	
+	return
+}
+
+# Now the application proper
+
+clear
+echo
+echo
+echo "Enter base shell test"
+sleep 1
+
+quit=n
+while [ "$quit" != "y" ];
+do
+	set_menu_choice
+	case "$menu_choice" in
+		1) if_function;;
+		2) case_function;;
+		3) for_function;;
+		4) while_function;;
+		5) until_function;;
+		6) variable_handle;;
+		7) param_handle;;
+		8) option_handle;;
+		9) trap_function;;
+		10) exec_function;;
+		11) source_function;;
+		12) here_function;;
+		q | Q ) quit=y;;
+		*) echo "Sorry, choice not recognized";;
+	esac
+done
+
+exit 0
+
+#set +x

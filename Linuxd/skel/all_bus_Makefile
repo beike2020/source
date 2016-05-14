@@ -1,0 +1,41 @@
+# Comment/uncomment the following line to enable/disable debugging
+#DEBUG = y
+
+
+ifeq ($(DEBUG),y)
+  DEBFLAGS = -O -g # "-O" is needed to expand inlines
+else
+  DEBFLAGS = -O2
+endif
+
+CFLAGS  += $(DEBFLAGS) -I$(LDDINCDIR)
+
+
+ifneq ($(KERNELRELEASE),)
+
+obj-m	:= pci_bus.o isa_bus.o usb_bus.o ldd_bus.o
+
+else
+
+KERNELDIR ?= /lib/modules/$(shell uname -r)/build
+PWD       := $(shell pwd)
+
+modules:
+	$(MAKE) -C $(KERNELDIR) SUBDIRS=$(PWD) LDDINCDIR=$(PWD)/../include modules
+
+endif
+
+
+install:
+	install -d $(INSTALLDIR)
+	install -c scull.o $(INSTALLDIR)
+
+clean:
+	rm -rf *.o *.ko *~ core .depend *.mod.c .*.cmd .tmp_versions .*.o.d
+
+depend .depend dep:
+	$(CC) $(CFLAGS) -M *.c > .depend
+
+ifeq (.depend,$(wildcard .depend))
+include .depend
+endif

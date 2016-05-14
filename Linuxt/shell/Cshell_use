@@ -1,0 +1,497 @@
+/************************************set uid***********************************/
+# ls -l
+	total 32
+	-rw-r--r-- 1 root root    0 Oct 24 09:11 Ashell_use
+	-rwxr-xr-x 1 root root 4745 Oct 23 04:06 Bshell_use
+	-rw-r--r-- 1 root root    0 Oct 24 09:24 Cshell_use
+	-rwxr-xr-x 1 root root 2016 Oct 23 04:06 Wshell_use
+	drwxr-xr-x 2 root root 4096 Oct 23 04:06 app
+	-rwxr-xr-x 1 root root   74 Oct 23 04:06 source_handle
+	-rwxr-xr-x 1 root root   61 Oct 23 04:06 textfile
+	-rwxr-xr-x 1 root root  336 Oct 23 04:06 words.txt
+	-rwxr-xr-x 1 root root 1274 Oct 23 04:06 words2.txt
+
+# ll words.txt 
+	-rwxr-xr-x 1 root root 336 Oct 23 04:06 words.txt
+# chmod u-x words.txt 
+# ll words.txt        
+	-rw-r-xr-x 1 root root 336 Oct 23 04:06 words.txt
+# chmod g+w words.txt 
+# ll words.txt 
+	-rw-rwxr-x 1 root root 336 Oct 23 04:06 words.txt
+# chmod o+w words.txt 
+# ll words.txt        
+	-rw-rwxrwx 1 root root 336 Oct 23 04:06 words.txt
+# chmod a+x words.txt 
+# ll words.txt        
+	-rwxrwxrwx 1 root root 336 Oct 23 04:06 words.txt
+
+# chmod 666 words.txt     
+# ll words.txt 
+	-rw-rw-rw- 1 root root 336 Oct 23 04:06 words.txt
+
+/************************************set sid***********************************/
+# chmod u+s words.txt
+# ll words.txt        
+	-rwSrw-rw- 1 root root 336 Oct 23 04:06 words.txt
+# chmod g+s words.txt 
+# ll words.txt 
+	-rwSrwSrw- 1 root root 336 Oct 23 04:06 words.txt
+# chmod o+s words.txt 
+# ll words.txt        
+	-rwSrwSrw- 1 root root 336 Oct 23 04:06 words.txt
+
+# chmod 4666 words.txt    
+# ll words.txt         
+	-rwSrw-rw- 1 root root 336 Oct 23 04:06 words.txt
+# chmod 6666 words.txt  
+# ll words.txt         
+	-rwSrwSrw- 1 root root 336 Oct 23 04:06 words.txt
+# chmod 7666 words.txt  
+# ll words.txt         
+	-rwSrwSrwT 1 root root 336 Oct 23 04:06 words.txt
+
+/************************************set own***********************************/
+# ll words.txt                                         
+	-rw-rw-rw- 1 root root 336 Oct 23 04:06 words.txt
+# chown beike words.txt 
+# ll words.txt 
+	-rw-rw-rw- 1 beike root 336 Oct 23 04:06 words.txt
+
+# chgrp users words.txt 
+# ll words.txt 
+	-rw-rw-rw- 1 beike users 336 Oct 23 04:06 words.txt
+
+/************************************set grp***********************************/
+# id
+	uid=0(root) gid=0(root) groups=0(root)
+
+#groups
+	root
+
+# groups beike
+	beike users
+
+/***********************************set umask**********************************/
+# umask
+	0022
+# touch aaa
+# ll aaa 
+	-rw-r--r-- 1 root root 0 Oct 24 09:42 aaa
+
+# umask 0002
+# touch bbb
+# ll bbb 
+	-rw-rw-r-- 1 root root 0 Oct 24 09:42 bbb
+
+/************************************set link**********************************/
+# ln -s app/title.cdb mylink
+# ll   
+total 40
+	-rw-r--r-- 1 root root    0 Oct 24 09:11 Ashell_use
+	-rwxr-xr-x 1 root root 4745 Oct 23 04:06 Bshell_use
+	-rwxr--r-- 1 root root 2736 Oct 24 09:44 Cshell_use
+	-rwx------ 1 root root 2652 Oct 24 09:43 Cshell_use.bak
+	-rwxr-xr-x 1 root root 2016 Oct 23 04:06 Wshell_use
+	drwxr-xr-x 2 root root 4096 Oct 23 04:06 app
+	lrwxrwxrwx 1 root root   13 Oct 24 09:47 mylink -> app/title.cdb
+	-rwxr-xr-x 1 root root   74 Oct 23 04:06 source_handle
+	-rwxr-xr-x 1 root root   61 Oct 23 04:06 textfile
+	-rwxr-xr-x 1 root root  336 Oct 23 04:06 words.txt
+	-rwxr-xr-x 1 root root 1274 Oct 23 04:06 words2.txt
+
+
+/************************************set find**********************************/
+# find . -name "[A-Z]shell_use" -print
+	./Ashell_use
+	./Cshell_use
+	./Bshell_use
+	./Wshell_use
+
+# find . -perm -644 -print      
+	.
+	./Ashell_use
+	./Cshell_use
+	./source_handle
+	./words.txt
+	./Bshell_use
+	./textfile
+	./app
+	./app/cd_db
+	./app/tracks.cdb
+	./app/title.cdb
+	./words2.txt
+	./Wshell_use
+
+# find . -user beike -print        
+	./words.txt
+
+# find . -group users -print         
+	./words.txt
+
+# find . -mtime -1 -print
+	.
+	./Ashell_use
+	./Cshell_use
+
+# find . -newer Ashell_use ! -newer Cshell_use -exec ls -l {} \;
+	total 3
+	-rw-r--r-- 1 root  root     0 Oct 24 09:11 Ashell_use
+	-rwxr-xr-x 1 root  root  4745 Oct 23 04:06 Bshell_use
+	-rwxr--r-- 1 root  root  4845 Oct 24 10:34 Cshell_use
+
+# find . -type d -print 
+	.
+	./app
+
+# find . -size +9 -print
+	./Cshell_use
+	./Bshell_use
+	./app/cd_db
+
+# find . -name "*.cdb" -depth -print
+	./app/tracks.cdb
+	./app/title.cdb
+
+$ find . -type f | xargs file
+	./Ashell_use:     empty
+	./Cshell_use:     ISO-8859 text, with CRLF line terminators
+	./source_handle:  POSIX shell script text executable
+	./words.txt:      ASCII English text
+	./Bshell_use:     POSIX shell script text executable
+	./textfile:       ASCII text
+	./app/cd_db:      Bourne-Again shell script text executable
+	./app/tracks.cdb: ASCII English text
+	./app/title.cdb:  ASCII English text
+	./words2.txt:     ASCII English text
+	./Wshell_use:     POSIX shell script text executable
+
+/************************************set cont**********************************/
+# crontab -u root -e cron
+	min	hour	day	month	week	cmd
+	0,30	18-23	*	*	6,0	/bin/find -name "core" -exec rm {} \;
+# vi $HOME/.profile
+	EDITOR=vi; export EDITOR
+# crontab cron
+
+# crontab -l
+# crontab -l > $HOME/mycron
+	[backup for error operation of delete file cron]
+# crontab -r cron
+# cat /var/spool/cron/crontabs/
+
+/*************************************set at***********************************/
+# at -f jobs.sh -m 15:00 May 24
+	[exec jobs.sh at May 24 15:00 and send mail to manager]
+
+# at -l
+	1 2011-5-24 15:00 a
+# cat /var/spool/cron/atspool
+
+# atrm job 1
+# at -l
+
+/*************************************set tee***********************************/
+# who | tee who.out
+	root     pts/0        Oct 24 07:54 (192.168.94.168)
+# cat who.out 
+	root     pts/0        Oct 24 07:54 (192.168.94.168)
+
+# who | tee -a who.out 
+	root     pts/0        Oct 24 07:54 (192.168.94.168)
+# cat who.out 
+	root     pts/0        Oct 24 07:54 (192.168.94.168)
+	root     pts/0        Oct 24 07:54 (192.168.94.168)
+
+/*************************************set exec***********************************/
+#!/bin/sh
+	exec 4<&0 0<words.txt
+	read line1
+	read line2
+	exec 0<&4
+	echo $line1
+	echo $line2
+# rm words.ttt || (echo "rm fail! " | mail beike; exit)
+# rm words.ttt || {echo "rm fail! " | mail beike; exit}
+
+/***********************************filter string*********************************/
+	....xc....					1234xc9088
+	^0014xc....					0014xc9088
+	ter$						computer
+	compu*t						computing
+	\*\.pas						*.pas
+	[Cc]omputer					computer
+	A\{2\}B						AAB
+	A\{4,\}B					AAAAAAB
+	A\{2,4\}B					AAAB
+	^.$						a
+	[^.*$]						[every line] 
+	[0-9]\{2\}-[0-9]\{2\}-[0-9]\{4\}		24-05-2011
+	[0-9]\{3\}\.[0-9]\{3\}\.[0-9]\{3\}\.[0-9]\{3\}	192.168.94.123
+
+/***********************************grep use***********************************/
+#grep --help
+	Usage: grep [OPTION]... PATTERN [FILE]...
+	Search for PATTERN in each FILE or standard input.
+	PATTERN is, by default, a basic regular expression (BRE).
+	Example: grep -i 'hello world' menu.h main.c
+
+	Regexp selection and interpretation:
+	-c, --count               print only a count of matching lines per FILE
+	-i, --ignore-case         ignore case distinctions
+	-h, --no-filename         suppress the prefixing filename on output
+	-l, --files-with-matches  print only names of FILEs containing matche
+	-n, --line-number         print line number with output lines
+	-s, --no-messages         suppress error messages
+	-v, --invert-match        select non-matching lines
+	-E, --extended-regexp     PATTERN is an extended regular expression (ERE)
+
+# grep -c -i "echo" *    
+	Ashell_use:0
+	Bshell_use:81
+	Cshell_use:4
+	Wshell_use:9
+	app:0
+	source_handle:2
+	textfile:0
+	who.out:0
+	words.txt:0
+	words2.txt:0
+
+# grep -c -i -h "echo" *         
+	0
+	86
+	6
+	15
+	0
+	2
+	0
+	0
+	0
+	0
+# grep -i -l "echo" *    
+	Bshell_use
+	Cshell_use
+	Wshell_use
+	source_handle
+
+# grep -i -n "echo" * 
+	Bshell_use:8:   echo "Is your name $* ?"
+	Bshell_use:11:          echo -n "Enter yes or no: "
+	Bshell_use:16:                  * )       echo "Answer yes or no"
+	Bshell_use:23:  echo "$foo"
+	...
+	source_handle:4:    echo 'aaaaaaaaa'
+	source_handle:9:    echo 'bbbbbbbbb'
+
+# grep -c -i -s "echo" *
+	Ashell_use:0
+	Bshell_use:81
+	Cshell_use:14
+	Wshell_use:9
+	app:0
+	source_handle:2
+	textfile:0
+	who.out:0
+	words.txt:0
+	words2.txt:0
+
+# grep -c -i -v "echo" * 
+	Ashell_use:0
+	Bshell_use:225
+	Cshell_use:282
+	Wshell_use:89
+	app:0
+	source_handle:8
+	textfile:5
+	who.out:2
+	words.txt:11
+	words2.txt:30
+
+# grep -c -i "echo\>" *         
+	Ashell_use:0
+	Bshell_use:81
+	Cshell_use:16
+	Wshell_use:9
+	app:0
+	source_handle:2
+	textfile:0
+	who.out:0
+	words.txt:0
+	words2.txt:0
+
+# grep -c -i -E  "echo|printf" *
+	Ashell_use:0
+	Bshell_use:82
+	Cshell_use:17
+	Wshell_use:9
+	app:0
+	source_handle:2
+	textfile:0
+	who.out:0
+	words.txt:0
+	words2.txt:0
+
+# grep -c '\.' * 
+	Ashell_use:0
+	Bshell_use:8
+	Cshell_use:141
+	Cshell_use.bak:142
+	Wshell_use:8
+	app:0
+	source_handle:0
+	textfile:0
+	who.out:2
+	words.txt:8
+	words2.txt:10
+
+# grep 'A*' words.txt   
+	When shall we three meet again.  In thunder, lightning, or in rain?
+	When the hurlyburly's done, when the battle's lost and won.
+	That will be ere the set of sun.
+	Where the place?
+	Upon the heath.  
+	There to meet with Macbeth.
+	I come, Graymalkin!
+	Paddock calls.
+	Anon.
+	Fair is foul, and foul is fair; hover through the fog and filthy air.
+
+# grep 'A[[:lower:]][[:lower:]][[:lower:]]' words.txt
+	Anon.
+
+/************************************evn use***********************************/
+# set
+	ARCH=i386
+	BASH=/bin/bash
+	BASH_ARGC=()
+	...
+	TERM=linux
+	UID=0
+	USER=root
+	_=Bshell_use
+
+# readonly 
+	declare -ar BASH_VERSINFO='([0]="3" [1]="2" [2]="39" [3]="1" [4]="release" [5]="i486-pc-linux-gnu")'
+	declare -ir EUID="0"
+	declare -ir PPID="2341"
+	declare -r SHELLOPTS="braceexpand:emacs:hashall:histexpand:history:interactive-comments:monitor"
+	declare -ir UID="0"
+
+# env
+	TERM=linux
+	SHELL=/bin/bash
+	SSH_CLIENT=192.168.94.168 1053 22
+	...
+	LOGNAME=root
+	SSH_CONNECTION=192.168.94.168 1053 192.168.94.166 22
+	ARCH=i386
+	_=/usr/bin/env
+	[ps: modify env at /etc/profile]
+	[EDITOR=vi£»export EDITOR]
+
+# time
+	real    0m0.000s
+	user    0m0.000s
+	sys     0m0.000s
+
+# type cp
+	cp is /bin/cp
+# type beike
+	-bash: type: beike: not found
+# type time
+
+# ulimit -a
+	core file size          (blocks, -c) 0
+	data seg size           (kbytes, -d) unlimited
+	scheduling priority             (-e) 0
+	file size               (blocks, -f) unlimited
+	pending signals                 (-i) 16303
+	max locked memory       (kbytes, -l) 32
+	max memory size         (kbytes, -m) unlimited
+	open files                      (-n) 1024
+	pipe size            (512 bytes, -p) 8
+	POSIX message queues     (bytes, -q) 819200
+	real-time priority              (-r) 0
+	stack size              (kbytes, -s) 8192
+	cpu time               (seconds, -t) unlimited
+	max user processes              (-u) 16303
+	virtual memory          (kbytes, -v) unlimited
+	file locks                      (-x) unlimited
+
+$ wait
+
+# cat >> test << HI
+	> hi
+	> beike
+	> HI
+# cat test 
+	hi
+	beike
+
+/************************************run level***********************************/
+# ls /etc/rc*
+	rc.local  rc0.d/    rc1.d/    rc2.d/    rc3.d/    rc4.d/    rc5.d/    rc6.d/    rcS.d/
+# ll /etc/rc3.d 
+	total 4
+	-rw-r--r-- 1 root root 556 Aug 12  2008 README
+	lrwxrwxrwx 1 root root  17 Jun 29 13:33 S10rsyslog -> ../init.d/rsyslog
+	lrwxrwxrwx 1 root root  15 Jun 29 13:34 S12acpid -> ../init.d/acpid
+	lrwxrwxrwx 1 root root  13 Jun 29 13:46 S16ssh -> ../init.d/ssh
+	lrwxrwxrwx 1 root root  15 Oct 21 13:19 S20cvsnt -> ../init.d/cvsnt
+	lrwxrwxrwx 1 root root  15 Jun 29 13:42 S20exim4 -> ../init.d/exim4
+	lrwxrwxrwx 1 root root  20 Jun 29 13:42 S20nfs-common -> ../init.d/nfs-common
+	lrwxrwxrwx 1 root root  23 Jun 29 13:42 S20openbsd-inetd -> ../init.d/openbsd-inetd
+	lrwxrwxrwx 1 root root  15 Jun 29 14:01 S20samba -> ../init.d/samba
+	lrwxrwxrwx 1 root root  13 Jun 29 13:42 S89atd -> ../init.d/atd
+	lrwxrwxrwx 1 root root  14 Jun 29 13:33 S89cron -> ../init.d/cron
+	lrwxrwxrwx 1 root root  18 Jun 29 13:33 S99rc.local -> ../init.d/rc.local
+	lrwxrwxrwx 1 root root  19 Jun 29 13:33 S99rmnologin -> ../init.d/rmnologin
+	lrwxrwxrwx 1 root root  23 Jun 29 13:33 S99stop-bootlogd -> ../init.d/stop-bootlogd
+
+# who -r
+         run-level 2  Oct 24 07:47                   last=S
+
+# cat /etc/inittab 
+	id:2:initdefault:
+	si::sysinit:/etc/init.d/rcS
+	~~:S:wait:/sbin/sulogin
+
+	# /etc/init.d executes the S and K scripts upon change
+	# of runlevel.
+	#
+	# Runlevel 0 is halt.
+	# Runlevel 1 is single-user.
+	# Runlevels 2-5 are multi-user.
+	# Runlevel 6 is reboot.
+
+	l0:0:wait:/etc/init.d/rc 0
+	l1:1:wait:/etc/init.d/rc 1
+	l2:2:wait:/etc/init.d/rc 2
+	l3:3:wait:/etc/init.d/rc 3
+	l4:4:wait:/etc/init.d/rc 4
+	l5:5:wait:/etc/init.d/rc 5
+	l6:6:wait:/etc/init.d/rc 6
+	1:2345:respawn:/sbin/getty 38400 tty1
+	2:23:respawn:/sbin/getty 38400 tty2
+	3:23:respawn:/sbin/getty 38400 tty3
+	4:23:respawn:/sbin/getty 38400 tty4
+	5:23:respawn:/sbin/getty 38400 tty5
+	6:23:respawn:/sbin/getty 38400 tty6
+
+# cat rc.local 
+	#!/bin/sh -e
+	#
+	# rc.local
+	#
+	# This script is executed at the end of each multiuser runlevel.
+	# Make sure that the script will "exit 0" on success or any other
+	# value on error.
+	#
+	# In order to enable or disable this script just change the execution
+	# bits.
+	#
+	# By default this script does nothing.
+	mount /dev/sda4 /home
+
+	exit 0

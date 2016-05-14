@@ -1,0 +1,160 @@
+linux-beike:/home/workspace # ll
+total 4
+-rw-r--r-- 1 root root 433 Nov 17 01:02 cpuid.s
+linux-beike:/home/workspace # cat cpuid.s 
+#cpuid.s Sample program to extract the processor Vendor ID
+.section .data
+output:
+   .ascii "The processor Vendor ID is 'xxxxxxxxxxxx'\n"
+.section .text
+.globl _start
+_start:
+   nop
+   movl $0, %eax
+   cpuid
+   movl $output, %edi
+   movl %ebx, 28(%edi)
+   movl %edx, 32(%edi)
+   movl %ecx, 36(%edi)
+   movl $4, %eax
+   movl $1, %ebx
+   movl $output, %ecx
+   movl $42, %edx
+   int $0x80
+   movl $1, %eax
+   movl $0, %ebx
+   int $0x80
+linux-beike:/home/workspace # as -gstabs -o cpuid.o cpuid.s                             
+linux-beike:/home/workspace # ld -dynamic-linker /lib/ld-linux.so.2 -lc -o cpuid cpuid.o
+linux-beike:/home/workspace # ./cpuid 
+The processor Vendor ID is 'AuthenticAMD'
+
+linux-beike:/home/workspace # gdb -q ./cpuid 
+Using host libthread_db library "/lib/libthread_db.so.1".
+(gdb) list _start
+3       output:
+4          .ascii "The processor Vendor ID is 'xxxxxxxxxxxx'\n"
+5       .section .text
+6       .globl _start
+7       _start:
+8          nop
+9          movl $0, %eax
+10         cpuid
+11         movl $output, %edi
+12         movl %ebx, 28(%edi)
+(gdb) break *_start+1
+Breakpoint 1 at 0x8048121: file cpuid.s, line 9.
+(gdb) break 20
+Breakpoint 2 at 0x804814c: file cpuid.s, line 20.
+(gdb) run
+Starting program: /home/workspace/cpuid 
+Breakpoint 1, _start () at cpuid.s:9
+9          movl $0, %eax
+Current language:  auto; currently asm
+(gdb) n
+_start () at cpuid.s:10
+10         cpuid
+(gdb) s
+_start () at cpuid.s:11
+11         movl $output, %edi
+(gdb) c
+Continuing.
+The processor Vendor ID is 'AuthenticAMD'
+Breakpoint 2, _start () at cpuid.s:20
+20         movl $1, %eax
+(gdb) info registers
+eax            0x2a     42
+ecx            0x804a000        134520832
+edx            0x2a     42
+ebx            0x1      1
+esp            0xbf8142d0       0xbf8142d0
+ebp            0x0      0x0
+esi            0xbf8142dc       -1082047780
+edi            0x804a000        134520832
+eip            0x804814c        0x804814c <_start+44>
+eflags         0x286    [ PF SF IF ]
+cs             0x73     115
+ss             0x7b     123
+ds             0x7b     123
+es             0x7b     123
+fs             0x0      0
+gs             0x33     51
+(gdb) info all
+eax            0x2a     42
+ecx            0x804a000        134520832
+edx            0x2a     42
+ebx            0x1      1
+esp            0xbf8142d0       0xbf8142d0
+ebp            0x0      0x0
+esi            0xbf8142dc       -1082047780
+edi            0x804a000        134520832
+eip            0x804814c        0x804814c <_start+44>
+eflags         0x286    [ PF SF IF ]
+cs             0x73     115
+ss             0x7b     123
+ds             0x7b     123
+es             0x7b     123
+fs             0x0      0
+gs             0x33     51
+st0            0        (raw 0x00000000000000000000)
+st1            0        (raw 0x00000000000000000000)
+st2            0        (raw 0x00000000000000000000)
+st3            0        (raw 0x00000000000000000000)
+st4            0        (raw 0x00000000000000000000)
+st5            0        (raw 0x00000000000000000000)
+st6            0        (raw 0x00000000000000000000)
+st7            0        (raw 0x00000000000000000000)
+fctrl          0x37f    895
+fstat          0x0      0
+ftag           0xffff   65535
+fiseg          0x0      0
+fioff          0x0      0
+foseg          0x0      0
+fooff          0x0      0
+fop            0x0      0
+---Type <return> to continue, or q <return> to quit---q
+Quit
+备注：registers - 常用寄存器， all - 所有寄存器
+
+(gdb) print $eax
+$1 = 42
+(gdb) print $st0
+$2 = 0
+(gdb) print $xmm0
+$3 = {v4_float = {0, 0, 0, 0}, v2_double = {0, 0}, v16_int8 = '\0' <repeats 15 times>, v8_int16 = {0, 0, 0, 0, 0, 0, 0, 0}, 
+  v4_int32 = {0, 0, 0, 0}, v2_int64 = {0, 0}, uint128 = 0x00000000000000000000000000000000}
+(gdb) print/d $eax
+$4 = 42
+(gdb) print/t $eax
+$5 = 101010
+(gdb) print/x $eax
+$6 = 0x2a
+备注：d - 十进制，t - 二进制， x - 十六进制。
+
+(gdb) x/42cb &output
+0x804a000 <output>:     84 'T'  104 'h' 101 'e' 32 ' '  112 'p' 114 'r' 111 'o' 99 'c'
+0x804a008 <output+8>:   101 'e' 115 's' 115 's' 111 'o' 114 'r' 32 ' '  86 'V'  101 'e'
+0x804a010 <output+16>:  110 'n' 100 'd' 111 'o' 114 'r' 32 ' '  73 'I'  68 'D'  32 ' '
+0x804a018 <output+24>:  105 'i' 115 's' 32 ' '  39 '\'' 65 'A'  117 'u' 116 't' 104 'h'
+0x804a020 <output+32>:  101 'e' 110 'n' 116 't' 105 'i' 99 'c'  65 'A'  77 'M'  68 'D'
+0x804a028 <output+40>:  39 '\'' 10 '\n'
+(gdb) x/42xb &output
+0x804a000 <output>:     0x54    0x68    0x65    0x20    0x70    0x72    0x6f    0x63
+0x804a008 <output+8>:   0x65    0x73    0x73    0x6f    0x72    0x20    0x56    0x65
+0x804a010 <output+16>:  0x6e    0x64    0x6f    0x72    0x20    0x49    0x44    0x20
+0x804a018 <output+24>:  0x69    0x73    0x20    0x27    0x41    0x75    0x74    0x68
+0x804a020 <output+32>:  0x65    0x6e    0x74    0x69    0x63    0x41    0x4d    0x44
+0x804a028 <output+40>:  0x27    0x0a
+备注：c - 字符，b - 字节，h - 16位，w - 32位，f - 浮点，
+      s - 字符串，g - double， gd - quad，均为内存中值。
+
+(gdb) print $esp
+$10 = (void *) 0xbf8142d0
+(gdb) x/20x 0xbf8142d0
+0xbf8142d0:     0x01    0x00    0x00    0x00    0x71    0x54    0x81    0xbf
+0xbf8142d8:     0x00    0x00    0x00    0x00    0x94    0x54    0x81    0xbf
+0xbf8142e0:     0xad    0x54    0x81    0xbf
+(gdb) x/s 0xbf8142d0
+0xbf8142d0:      "/home/workspace/cpuid"
+备注：由esp得到程序参数等信息。
+
