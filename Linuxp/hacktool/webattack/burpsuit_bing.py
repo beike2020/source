@@ -11,7 +11,7 @@ from java.net import URL
 from javax.swing import JMenuItem
 from java.util import List, ArrayList
 
-bing_api_key = "YOURKEYHERE"
+bing_api_key = "S53/kaUVJzLgAMVz2rme5xghEWhsw/Y2RFi+PeF2Llk"
 
 
 class BurpExtender(IBurpExtender, IContextMenuFactory):
@@ -58,7 +58,7 @@ class BurpExtender(IBurpExtender, IContextMenuFactory):
     def bing_query(self,bing_query_string): 
         print "Performing Bing search: %s" % bing_query_string
         quoted_query = urllib.quote(bing_query_string)
-        http_request  = "GET https://api.datamarket.azure.com/Bing/Search/Web?$format=json&$top=20&Query=%s HTTP/1.1\r\n" % quoted_query    
+        http_request  = "https://api.datamarket.azure.com/Bing/Search/v1/Web?$format=json&$Query=%s HTTP/1.1\r\n" % quoted_query    
         http_request += "Host: api.datamarket.azure.com\r\n"
         http_request += "Connection: close\r\n"
         http_request += "Authorization: Basic %s\r\n" % base64.b64encode(":%s" % bing_api_key)

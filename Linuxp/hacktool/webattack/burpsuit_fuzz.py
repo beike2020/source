@@ -47,7 +47,7 @@ class BHPFuzzer(IIntruderPayloadGenerator):
         self.num_payloads += 1
         return payload
 
-   def mutate_payload(self, original_payload):
+    def mutate_payload(self, original_payload):
         picker = random.randint(1, 3)
         offset  = random.randint(0, len(original_payload)-1)
         payload = original_payload[:offset]
@@ -60,10 +60,10 @@ class BHPFuzzer(IIntruderPayloadGenerator):
             repeater     = random.randint(1, 10)
             for i in range(repeater):
                 payload += original_payload[offset:offset+chunk_length]
-         payload += original_payload[offset:]
-         return payload
+        payload += original_payload[offset:]
+        return payload
 
-     def reset(self):
+    def reset(self):
         self.num_payloads = 0
         return
 
